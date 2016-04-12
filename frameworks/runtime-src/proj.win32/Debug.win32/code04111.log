@@ -1,0 +1,36 @@
+﻿Build started 2016/4/11 22:12:56.
+     1>Project "D:\mygame\frameworks\runtime-src\proj.win32\code04111.vcxproj" on node 2 (Build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(1193,5): warning MSB8012: TargetPath(D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\code04111.exe) does not match the Linker's OutputFile property value (D:\mygame\simulator\win32\code04111.exe). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+     1>PreLinkEvent:
+         if not exist "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\" mkdir "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\"
+         xcopy /Y /Q "E:\Cocos310\Cocos2d-x\cocos2d-x-3.10\prebuilt\win32\*.*" "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\"
+         
+         :VCEnd
+         复制了 60 个文件
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\mygame\frameworks\runtime-src\proj.win32\../../../simulator/win32/code04111.exe" /INCREMENTAL /NOLOGO /LIBPATH:"D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\\" /LIBPATH:"D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\\" libcurl_imp.lib websockets.lib opengl32.lib glew32.lib libzlib.lib libwebp.lib libiconv.lib freetype.lib winmm.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:libcmt.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\mygame\frameworks\runtime-src\proj.win32\../../../simulator/win32/code04111.pdb" /SUBSYSTEM:WINDOWS,"5.01" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\code04111.lib" /MACHINE:X86 Debug.win32\game.res
+         Debug.win32\AppDelegate.obj
+         Debug.win32\lua_debugger.obj
+         Debug.win32\RuntimeLuaImpl.obj
+         Debug.win32\main.obj
+         Debug.win32\SimulatorWin.obj
+         Debug.win32\stdafx.obj
+            Creating library D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\code04111.lib and object D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\code04111.exp
+         code04111.vcxproj -> D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\code04111.exe
+       CustomBuildStep:
+         if not exist "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\../../../../simulator/win32" mkdir "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\../../../../simulator/win32"
+         xcopy /Y /Q "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\*.dll" "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\../../../../simulator/win32"
+         xcopy /Y /Q "D:\mygame\frameworks\runtime-src\proj.win32\..\Classes\ide-support\lang" "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\../../../../simulator/win32"
+         xcopy "D:\mygame\frameworks\runtime-src\proj.win32\..\..\..\res" "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\../../../../simulator/win32\res" /D /E /I /F /Y
+         xcopy "D:\mygame\frameworks\runtime-src\proj.win32\..\..\..\src" "D:\mygame\frameworks\runtime-src\proj.win32\Debug.win32\../../../../simulator/win32\src" /D /E /I /F /Y
+         :VCEnd
+         复制了 16 个文件
+         复制了 1 个文件
+         复制了 0 个文件
+         D:\mygame\src\main.lua -> D:\mygame\simulator\win32\src\main.lua
+         复制了 1 个文件
+     1>Done Building Project "D:\mygame\frameworks\runtime-src\proj.win32\code04111.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.15
