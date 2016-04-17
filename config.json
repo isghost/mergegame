@@ -1,6 +1,6 @@
 {
   "init_cfg": {
-    "isLandscape": true,
+    "isLandscape": false,
     "isWindowTop": false,
     "name": "code04111",
     "width": 960,

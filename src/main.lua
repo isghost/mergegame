@@ -5,6 +5,8 @@ cc.FileUtils:getInstance():addSearchPath("res/")
 
 require "config"
 require "cocos.init"
+require "game.init"
+require "ccyeasy.init"
 
 local function main()
     local scene = cc.Scene:create()
@@ -15,7 +17,9 @@ local function main()
     local label = cc.Label:createWithSystemFont("Hello Mygame", "Helvetica", 24)
     	:addTo(scene)
     	:setPosition(display.center)
-    display.runScene(scene)
+        print("1111111")
+    display.runScene(GameScene:create())
+    print("1111112")
 end
 
 local status, msg = xpcall(main, __G__TRACKBACK__)
