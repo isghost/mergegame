@@ -5,10 +5,10 @@ cc.FileUtils:getInstance():addSearchPath("res/")
 
 require "config"
 require "cocos.init"
-require "game.init"
-require "ccyeasy.init"
 
 local function main()
+    require "game.init"
+    require "ccyeasy.init"
     local scene = cc.Scene:create()
     local sprite = cc.Sprite:create("HelloWorld.png")
     	:addTo(scene)

@@ -7,3 +7,4 @@
  require "game.MainScene"
  require "game.AboutScene"
  require "game.GameScene"
+ require "game.GameModel"
