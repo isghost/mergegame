@@ -120,10 +120,10 @@ function GameScene:runMoveAction(actionMove)
 		local view = self.views[v.from]
 			:setLocalZOrder(50)
 		self.views[v.from] = nil
-		local moveTo = cc.MoveTo:create(0.5, self.cells[v.to]:getPosition())
-		local callFunc = function()
+		local moveTo = cc.MoveTo:create(0.5, cc.p(self.cells[v.to]:getPosition()))
+		local callFunc = cc.CallFunc:create(function()
 			view:removeFromParent()
-		end
+		end)
 		view:runAction(cc.Sequence:create(moveTo, callFunc))
 	end
 end
@@ -146,7 +146,6 @@ function GameScene:runCreateAction(pos,num)
 end
 
 function GameScene:runActionQueue(actionQueue)
-	dump(actionQueue)
 	local curActionIndex = 1
 	local endCallFunc = nil
 	local actionDelay = cc.DelayTime:create(0.3)
@@ -154,16 +153,28 @@ function GameScene:runActionQueue(actionQueue)
 		if actionQueue[curActionIndex] then
 			local action = actionQueue[curActionIndex]
 			curActionIndex = curActionIndex + 1
+			local callfunc = nil
 			if action.actionType == "move" then
-				local callFunc = cc.CallFunc:create(function()
+				callFunc = cc.CallFunc:create(function()
 					self:runMoveAction(action.result)
 				end)
-				self:runAction(cc.Sequence:create(callFunc, actionDelay:clone()), endCallFunc:clone())
 			elseif action.actionType == "create" then
-				self:runCreateAction(action.pos, action.value)
+				callFunc = cc.CallFunc:create(function()
+					self:runCreateAction(action.pos, action.value)
+				end)
 			end
+			-- 存在一个runAction bug
+			-- #12082, 不知道为什么被关闭
+			-- http://stackoverflow.com/questions/28130156/callfunc-doesn-t-get-called-after-delay
+			-- 解决方案：callFunc已经被释放，retain一下
+			self:runAction(cc.Sequence:create(callFunc, cc.DelayTime:create(0.2), endCallFunc:clone()))
+		else
+			-- warning release
+			endCallFunc:release()
 		end
 	end)
+	-- warning retain
+	endCallFunc:retain()
 	self:runAction(endCallFunc)
 end
 

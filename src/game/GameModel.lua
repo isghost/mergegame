@@ -123,7 +123,6 @@ function GameModel:tapItems()
 end
 -- 移动item后，将item移到合适的位置
 function GameModel:setItemProperPosition(pos)
-    print("pos = 11111",pos.x, pos.y)
     if #self.toDoNums == 1 then
         local index = self:getMinDisCell(pos)
         if index then
