@@ -9,7 +9,10 @@ GameScene = class("GameScene",function()
 end)
 
 function GameScene:ctor()
-	self.newNumNode = nil
+	-- 前三个参数都是用于最下面，待移动的数字
+	self.newNumNode = nil -- 一个node,用于包含待移动数字
+	self.toDoItemViews = {} -- 待移动数字合集
+	self.posIndex = 1 -- 待移动数字的位置，顺时针 1 ,2,3,4
 	self.views = {}
 	self:initUI()
 	self:initLogic()
@@ -110,7 +113,12 @@ function GameScene:initLogic()
 			if dis < 10 then
 				self.gameModel:tapItems()
 			else
-				self.gameModel:setItemProperPosition(self:convertToNodeSpace(nowPos))
+				local pos1,pos2 = nil, nil
+				pos1 = self.newNumNode:convertToWorldSpace(cc.p(self.toDoItemViews[1]:getPosition()))
+				if self.toDoItemViews[2] then
+					pos2 = self.newNumNode:convertToWorldSpace(cc.p(self.toDoItemViews[2]:getPosition()))
+				end
+				self.gameModel:setItemProperPosition(pos1, pos2)
 			end
 		end)
 end
@@ -179,12 +187,32 @@ function GameScene:runActionQueue(actionQueue)
 end
 
 function GameScene:addToDoItem(nums)
+	local contentSize = self.newNumNode:getContentSize()
 	if #nums == 1 then
-		local contentSize = self.newNumNode:getContentSize()
-		local spriteNum = cc.Sprite:create("num_"..nums[1]..".png")
+		local num1View = cc.Sprite:create("num_"..nums[1]..".png")
 			:setAnchorPoint(cc.p(0.5, 0.5))
 			:setPosition(contentSize.width / 2 , contentSize.height / 2)
-		self.newNumNode:addChild(spriteNum)
+			:addTo(self.newNumNode)
+		self.toDoItemViews = {num1View}
+	elseif #nums == 2 then
+		local num1View = cc.Sprite:create("num_"..nums[1]..".png")
+			:setAnchorPoint(cc.p(0.5, 0.5))
+			:setPosition(contentSize.width / 2 , contentSize.height / 2 + 52)
+			:addTo(self.newNumNode)
+		local num2View = cc.Sprite:create("num_"..nums[2]..".png")
+			:setAnchorPoint(cc.p(0.5, 0.5))
+			:setPosition(contentSize.width / 2 , contentSize.height / 2 - 52)
+			:addTo(self.newNumNode)
+		self.toDoItemViews = {num1View, num2View}
+	end
+end
+
+-- 恢复到待处理东西的默认位置
+function GameScene:resetToDoItem(clearItem)
+	local itemX, itemY = display.center.x, 200
+	self.newNumNode:setPosition(itemX, itemY)
+	if clearItem then
+		self.newNumNode:removeAllChildren()
 	end
 end
 

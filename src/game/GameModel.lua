@@ -9,7 +9,6 @@ function GameModel:ctor(view)
 	self.view = view -- 场景 view
 	self.nums = {} -- 数字合集
     self.toDoNums = {} -- 待处理数字合集
-    self.toDoNumsAngle = 0 -- 待处理数字旋转角度
 	self.score = 0 -- 成绩
 	self:init()
 end
@@ -75,7 +74,8 @@ function GameModel:checkSynthesis(pos)
         front = front + 1
         for i=1,4 do
             local tmpPos = curPos + forward[i]
-            if not vis[tmpPos] and self.nums[tmpPos] == value then
+            local flag = (curPos % 5 == 1 and i == 4) or (curPos % 5 == 0 and i == 2)
+            if not vis[tmpPos] and self.nums[tmpPos] == value and not flag then
                 vis[tmpPos] = true 
                 rear = rear + 1
                 queue[rear] = tmpPos
@@ -109,9 +109,40 @@ end
 
 -- 添加待移动的数字
 function GameModel:addToDoItem()
-    local num = math.random(1,3)
-    self.toDoNums = {num}
-    self.view:addToDoItem({num})
+    if self:getCreateItemNum() == 1 then
+        local num = math.random(1,3)
+        self.toDoNums = {num}
+        self.view:addToDoItem({num})
+    else
+        local num1 = math.random(1,3)
+        local num2 = num1
+        while num2 == num1 do
+            num2 = math.random(1,3)
+        end
+        self.toDoNums = {num1, num2}
+        self.view:addToDoItem({num1, num2})
+    end
+end
+-- 产生item的数量
+function GameModel:getCreateItemNum()
+    local flag = false
+    local forward = {-5,1,5,-1}
+    for curPos = 1, 25 do
+        for i=1, 4 do
+            local tmpPos = curPos + forward[i]
+            local flag2 = (curPos % 5 == 1 and i == 4) or (curPos % 5 == 0 and i == 2)
+            if  tmpPos >= 1 and tmpPos <= 25 and not self.nums[tmpPos] and not flag2 then
+                flag = true
+                break
+            end
+        end
+    end
+    if flag then
+        local kk = randomByWeight(2, 8)
+        return kk
+    else
+        return 1
+    end
 end
 
 -- 两个以上item时，顺时针切换
@@ -122,12 +153,25 @@ function GameModel:tapItems()
     end
 end
 -- 移动item后，将item移到合适的位置
-function GameModel:setItemProperPosition(pos)
+function GameModel:setItemProperPosition(pos1, pos2)
     if #self.toDoNums == 1 then
-        local index = self:getMinDisCell(pos)
+        local index = self:getMinDisCell(pos1)
         if index then
             self:addGood(index, self.toDoNums[1])
+            self.view:resetToDoItem(true)
+            self:addToDoItem()
         else
+            self.view:resetToDoItem(false)
+        end
+    elseif #self.toDoNums == 2 then
+        local index1 = self:getMinDisCell(pos1)
+        local index2 = self:getMinDisCell(pos2)
+        if index1 and index2 then
+            self:addGood(index1, self.toDoNums[1], index2, self.toDoNums[2])
+            self.view:resetToDoItem(true)
+            self:addToDoItem()
+        else
+            self.view:resetToDoItem(false)
         end
     end
 end
@@ -145,7 +189,7 @@ function GameModel:getMinDisCell(pos)
             minDis = dis
         end
     end
-    if self.nums[index] then
+    if self.nums[index] or minDis > 75 then
         return nil
     else
         return index
