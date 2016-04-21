@@ -52,7 +52,7 @@ function GameModel:checkSynthesisAll(posQueue)
 				actionQueue[#actionQueue + 1] = action1
 				actionQueue[#actionQueue + 1] = action2
 			else
-				actionQueue[#actionQueue + 1] = action1
+				--actionQueue[#actionQueue + 1] = action1
 			end
 		end
 	end
@@ -62,6 +62,7 @@ end
 function GameModel:checkSynthesis(pos)
 -- 检查合成
 	local value = self.nums[pos]
+    if not value then return end
 	local vis = {}
     local queue = {}
     local forward = {-5,1,5,-1}
@@ -128,12 +129,14 @@ function GameModel:getCreateItemNum()
     local flag = false
     local forward = {-5,1,5,-1}
     for curPos = 1, 25 do
-        for i=1, 4 do
-            local tmpPos = curPos + forward[i]
-            local flag2 = (curPos % 5 == 1 and i == 4) or (curPos % 5 == 0 and i == 2)
-            if  tmpPos >= 1 and tmpPos <= 25 and not self.nums[tmpPos] and not flag2 then
-                flag = true
-                break
+        if not self.nums[curPos] then
+            for i=1, 4 do
+                local tmpPos = curPos + forward[i]
+                local flag2 = (curPos % 5 == 1 and i == 4) or (curPos % 5 == 0 and i == 2)
+                if  tmpPos >= 1 and tmpPos <= 25 and not self.nums[tmpPos] and not flag2 then
+                    flag = true
+                    break
+                end
             end
         end
     end
@@ -145,13 +148,7 @@ function GameModel:getCreateItemNum()
     end
 end
 
--- 两个以上item时，顺时针切换
-function GameModel:tapItems()
-    if #self.nums  == 1 then
-        return 
-    else
-    end
-end
+
 -- 移动item后，将item移到合适的位置
 function GameModel:setItemProperPosition(pos1, pos2)
     if #self.toDoNums == 1 then

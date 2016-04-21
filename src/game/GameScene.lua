@@ -93,10 +93,10 @@ function GameScene:initUI()
 		:setPosition(50, 50)
 
 	self.newNumNode = cc.Node:create()
-		:setPosition(display.center.x, 200)
 		:addTo(self, 1, 111)
-		:setContentSize(cc.size(100,100))
+		:setContentSize(cc.size(200,200))
 		:setAnchorPoint(cc.p(0.5, 0.5))
+	self:resetToDoItem()
 end
 
 function GameScene:initLogic()
@@ -109,9 +109,9 @@ function GameScene:initLogic()
 		end,function(touch, event)
 			local nowPos = touch:getLocation()
 			local startPos = touch:getStartLocation()
-			local dis = cc.pGetLength(nowPos, startPos)
-			if dis < 10 then
-				self.gameModel:tapItems()
+			local dis = cc.pGetDistance(nowPos, startPos)
+			if dis < 3 then
+				self:tapItems()
 			else
 				local pos1,pos2 = nil, nil
 				pos1 = self.newNumNode:convertToWorldSpace(cc.p(self.toDoItemViews[1]:getPosition()))
@@ -187,6 +187,7 @@ function GameScene:runActionQueue(actionQueue)
 end
 
 function GameScene:addToDoItem(nums)
+	self.posIndex = 0
 	local contentSize = self.newNumNode:getContentSize()
 	if #nums == 1 then
 		local num1View = cc.Sprite:create("num_"..nums[1]..".png")
@@ -197,22 +198,39 @@ function GameScene:addToDoItem(nums)
 	elseif #nums == 2 then
 		local num1View = cc.Sprite:create("num_"..nums[1]..".png")
 			:setAnchorPoint(cc.p(0.5, 0.5))
-			:setPosition(contentSize.width / 2 , contentSize.height / 2 + 52)
+			--:setPosition(contentSize.width / 2 , contentSize.height / 2 + 52)
 			:addTo(self.newNumNode)
 		local num2View = cc.Sprite:create("num_"..nums[2]..".png")
 			:setAnchorPoint(cc.p(0.5, 0.5))
-			:setPosition(contentSize.width / 2 , contentSize.height / 2 - 52)
+			--:setPosition(contentSize.width / 2 , contentSize.height / 2 - 52)
 			:addTo(self.newNumNode)
 		self.toDoItemViews = {num1View, num2View}
+		self:tapItems()
 	end
 end
 
 -- 恢复到待处理东西的默认位置
 function GameScene:resetToDoItem(clearItem)
-	local itemX, itemY = display.center.x, 200
+	local itemX, itemY = display.center.x, 125
 	self.newNumNode:setPosition(itemX, itemY)
 	if clearItem then
 		self.newNumNode:removeAllChildren()
 	end
+end
+
+-- 两个以上item时，顺时针切换
+function GameScene:tapItems()
+    if #self.toDoItemViews  == 1 then
+        return 
+    elseif #self.toDoItemViews == 2 then
+    	local contentSize = self.newNumNode:getContentSize()
+    	local centerX, centerY = contentSize.width / 2 , contentSize.height / 2
+    	local deltaPos = {{0, 52}, {52, 0}, {0, -52}, {-52,0}}
+    	self.posIndex = self.posIndex%4 + 1
+    	local pos1X, pos1Y = centerX + deltaPos[self.posIndex][1], centerY + deltaPos[self.posIndex][2]
+    	local pos2X, pos2Y = centerX + deltaPos[(self.posIndex + 1)%4 + 1][1], centerY + deltaPos[(self.posIndex + 1)%4 + 1][2]
+    	self.toDoItemViews[1]:setPosition(pos1X, pos1Y)
+    	self.toDoItemViews[2]:setPosition(pos2X, pos2Y)
+    end
 end
 
