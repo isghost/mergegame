@@ -93,10 +93,18 @@ function GameScene:initUI()
 		:setPosition(50, 50)
 
 	self.newNumNode = cc.Node:create()
-		:addTo(self, 1, 111)
+		:addTo(self, 1000, 111)
 		:setContentSize(cc.size(200,200))
 		:setAnchorPoint(cc.p(0.5, 0.5))
 	self:resetToDoItem()
+
+	local rotateAction = cc.RepeatForever:create(cc.RotateBy:create(3.0,360))
+	self.rotationBg = cc.Sprite:create("rotation.png")
+		:setPosition(self.newNumNode:getPosition())
+		:addTo(self,500,112)
+		:runAction(rotateAction)
+		:setVisible(false)
+
 end
 
 function GameScene:initLogic()

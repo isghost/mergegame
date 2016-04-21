@@ -186,7 +186,7 @@ function GameModel:getMinDisCell(pos)
             minDis = dis
         end
     end
-    if self.nums[index] or minDis > 75 then
+    if self.nums[index] or minDis > 50 then
         return nil
     else
         return index
