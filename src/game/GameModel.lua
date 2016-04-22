@@ -10,6 +10,8 @@ function GameModel:ctor(view)
 	self.nums = {} -- 数字合集
     self.toDoNums = {} -- 待处理数字合集
 	self.score = 0 -- 成绩
+    self.bestScore = cc.UserDefault:getInstance():getIntegerForKey("bestScore",0) -- 不合理写法
+    self.coin = cc.UserDefault:getInstance():getIntegerForKey("coin",0) -- 不合理写法
 	self:init()
 end
 
@@ -22,6 +24,10 @@ function GameModel:init()
 	end
 	self:addGood(pos,num)
     self:addToDoItem()
+    -- setNum
+    self.view:setScore(self.score)
+    self.view:setBeseScore(self.bestScore)
+    self.view:setCoin(self.coin)
 end
 
 function GameModel:addGood(pos1,num1,pos2,num2)
@@ -35,28 +41,40 @@ function GameModel:addGood(pos1,num1,pos2,num2)
         self.nums[pos2] = num2
         self.view:addGood(pos2, num2)
 	end
-	local actionQueue = self:checkSynthesisAll({pos1,pos2})
+	local actionQueue ,addScore = self:checkSynthesisAll({pos1,pos2})
 	self.view:runActionQueue(actionQueue)
+    if addScore <= 0 then
+        return 
+    end
+    self.view:runScoreTo(self.score, self.score + addScore)
+    self.score = self.score + addScore
+    if self.score > self.bestScore then
+        self.bestScore = self.score
+        self.view:setBeseScore(self.bestScore)
+        cc.UserDefault:getInstance():setIntegerForKey("bestScore", self.bestScore)
+    end
 end
 
 function GameModel:checkSynthesisAll(posQueue)
 	local actionQueue = {}
+    local addScore = 0 -- 增加的分数
 	for i = 1,#posQueue do
 		local pos = posQueue[i]
 		local flag = true
 		while flag do
 			flag = false
-			local tmpFlag, action1,action2 = self:checkSynthesis(pos)
-			flag = tmpFlag
+			local valueSum, action1,action2 = self:checkSynthesis(pos)
+			flag = valueSum
 			if flag then
 				actionQueue[#actionQueue + 1] = action1
 				actionQueue[#actionQueue + 1] = action2
+                addScore = addScore + valueSum
 			else
 				--actionQueue[#actionQueue + 1] = action1
 			end
 		end
 	end
-	return actionQueue
+	return actionQueue, addScore
 end
 
 function GameModel:checkSynthesis(pos)
@@ -85,15 +103,15 @@ function GameModel:checkSynthesis(pos)
     end
 -- 返回结果
     local result = {}
-    local num = 0 -- 相连相同块的数量
+    local count = 0 -- 相连相同块的数量
     for i = 1, 25 do
     	if vis[i] then
     		result[#result + 1] = {from = i,to = pos}
-    		num = num + 1
+    		count = count + 1
     	end
     end
 -- 无法合成
-    if num < 3 then
+    if count < 3 then
         return 
     end
 -- 可以合成
@@ -105,7 +123,8 @@ function GameModel:checkSynthesis(pos)
 
     self.nums[pos] = value + 1
 
-    return #result * value , {actionType = "move",result = result}, {actionType = "create",pos = pos,value = value + 1}
+    return #result * value , {actionType = "merge",result = result, value = value * count, pos = pos}, 
+        {actionType = "create",pos = pos,value = value + 1}
 end
 
 -- 添加待移动的数字

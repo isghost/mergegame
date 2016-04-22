@@ -27,11 +27,11 @@ function GameScene:initUI()
 		:setTextColor(cc.c4b(255,255,255,255))
 		:setPosition(display.center.x, 1100)
 
-	local score = cc.Sprite:create("best.png")
+	local bestScore = cc.Sprite:create("best.png")
 	    :setPosition(cc.p(25, 1000))
     	:addTo(self,1,102)
 
-    self.scoreNum = cc.Label:create()
+    self.bestScoreNum = cc.Label:create()
 		:setString("546")
 		:addTo(self,1,103)
 		:setSystemFontSize(35)
@@ -52,7 +52,7 @@ function GameScene:initUI()
 		:setTextColor(cc.c4b(125,125,125,255))
 		:setPosition(50, 960)
 
-    self.scoreNum = cc.Label:create()
+    self.curScoreNum = cc.Label:create()
 		:setString("546")
 		:addTo(self,1,106)
 		:setSystemFontSize(70)
@@ -102,8 +102,8 @@ function GameScene:initUI()
 	self.rotationBg = cc.Sprite:create("rotation.png")
 		:setPosition(self.newNumNode:getPosition())
 		:addTo(self,500,112)
-		:runAction(rotateAction)
 		:setVisible(false)
+	self.rotationBg:runAction(rotateAction)
 
 end
 
@@ -114,6 +114,7 @@ function GameScene:initLogic()
 			local delta = touch:getDelta()
 			local curPosX,curPosY = self.newNumNode:getPosition()
 			self.newNumNode:setPosition(curPosX + delta.x, curPosY + delta.y)
+			self.rotationBg:setVisible(false)
 		end,function(touch, event)
 			local nowPos = touch:getLocation()
 			local startPos = touch:getStartLocation()
@@ -132,7 +133,8 @@ function GameScene:initLogic()
 end
 
 function GameScene:runMoveAction(actionMove)
-	for k,v in pairs(actionMove) do
+	local result = actionMove.result
+	for k,v in pairs(result) do
 		local view = self.views[v.from]
 			:setLocalZOrder(50)
 		self.views[v.from] = nil
@@ -141,6 +143,7 @@ function GameScene:runMoveAction(actionMove)
 			view:removeFromParent()
 		end)
 		view:runAction(cc.Sequence:create(moveTo, callFunc))
+		self:flyNum(actionMove.pos, actionMove.value)
 	end
 end
 
@@ -170,9 +173,9 @@ function GameScene:runActionQueue(actionQueue)
 			local action = actionQueue[curActionIndex]
 			curActionIndex = curActionIndex + 1
 			local callfunc = nil
-			if action.actionType == "move" then
+			if action.actionType == "merge" then
 				callFunc = cc.CallFunc:create(function()
-					self:runMoveAction(action.result)
+					self:runMoveAction(action)
 				end)
 			elseif action.actionType == "create" then
 				callFunc = cc.CallFunc:create(function()
@@ -203,6 +206,7 @@ function GameScene:addToDoItem(nums)
 			:setPosition(contentSize.width / 2 , contentSize.height / 2)
 			:addTo(self.newNumNode)
 		self.toDoItemViews = {num1View}
+		self.rotationBg:setVisible(false)
 	elseif #nums == 2 then
 		local num1View = cc.Sprite:create("num_"..nums[1]..".png")
 			:setAnchorPoint(cc.p(0.5, 0.5))
@@ -214,6 +218,7 @@ function GameScene:addToDoItem(nums)
 			:addTo(self.newNumNode)
 		self.toDoItemViews = {num1View, num2View}
 		self:tapItems()
+		self.rotationBg:setVisible(true)
 	end
 end
 
@@ -223,6 +228,10 @@ function GameScene:resetToDoItem(clearItem)
 	self.newNumNode:setPosition(itemX, itemY)
 	if clearItem then
 		self.newNumNode:removeAllChildren()
+	else
+		if #self.toDoItemViews == 2 then
+			self.rotationBg:setVisible(true)
+		end
 	end
 end
 
@@ -240,5 +249,36 @@ function GameScene:tapItems()
     	self.toDoItemViews[1]:setPosition(pos1X, pos1Y)
     	self.toDoItemViews[2]:setPosition(pos2X, pos2Y)
     end
+end
+
+function GameScene:setScore(value)
+	self.curScoreNum:setString(value)
+end
+
+function GameScene:setBeseScore(value)
+	self.bestScoreNum:setString(value)
+end
+
+function GameScene:setCoin(value)
+	self.coinNum:setString(value)
+end
+
+function GameScene:flyNum(pos,value)
+	local numLabel = cc.Label:create()
+		:setString(value)
+		:setPosition(self.cells[pos]:getPosition())
+		:setSystemFontSize(40)
+		:addTo(self,1200)
+
+	local moveBy = cc.MoveBy:create(0.5, cc.p(0,100))
+	local callFunc = cc.CallFunc:create(function()
+		numLabel:removeFromParent()
+	end)
+
+	numLabel:runAction(cc.Sequence:create(moveBy,callFunc))
+end
+
+function GameScene:runScoreTo(beginValue, endValue)
+	self.curScoreNum:unscheduleUpdate()
 end
 
