@@ -10,8 +10,9 @@ function GameModel:ctor(view)
 	self.nums = {} -- 数字合集
     self.toDoNums = {} -- 待处理数字合集
 	self.score = 0 -- 成绩
-    self.bestScore = cc.UserDefault:getInstance():getIntegerForKey("bestScore",0) -- 不合理写法
-    self.coin = cc.UserDefault:getInstance():getIntegerForKey("coin",0) -- 不合理写法
+    self.bestScore = cc.UserDefault:getInstance():getIntegerForKey("bestScore", 0) -- 不合理写法
+    self.coin = cc.UserDefault:getInstance():getIntegerForKey("coin", 0) -- 不合理写法
+    self.level = self:getLevelByExp(cc.UserDefault:getInstance():getIntegerForKey("exp", 1))
 	self:init()
 end
 
@@ -44,9 +45,17 @@ function GameModel:addGood(pos1,num1,pos2,num2)
 	local actionQueue ,addScore = self:checkSynthesisAll({pos1,pos2})
 	self.view:runActionQueue(actionQueue)
     if addScore <= 0 then
+    	if self:isGameOver() then
+    		self:gameOver()
+    	end
         return 
     end
     self.view:runScoreTo(self.score, self.score + addScore)
+    -- 防止修改数据 ------------------------------------------
+    local tmpScore = self.score
+    self.score = {}
+    self.score = tmpScore
+    ----------------------------------------------------------
     self.score = self.score + addScore
     if self.score > self.bestScore then
         self.bestScore = self.score
@@ -87,7 +96,6 @@ function GameModel:checkSynthesis(pos)
     local rear,front = 0,0
     queue[0] = pos 
     vis[pos] = true 
-    local addLevel = 0
     while rear >= front do
         local curPos = queue[front]
         front = front + 1
@@ -210,4 +218,33 @@ function GameModel:getMinDisCell(pos)
     else
         return index
     end
+end
+
+function GameModel:isGameOver()
+	for i = 1, 25 do
+		if not self.nums[i] then
+			return false
+		end
+	end
+	return true
+end
+
+function GameModel:gameOver()
+	local earnCoin = math.floor(self.score * (self.level * 0.1 + 1))
+	local coin = cc.UserDefault:getInstance():getIntegerForKey("coin", 0) -- 不合理写法
+    local exp = cc.UserDefault:getInstance():getIntegerForKey("exp", 1)
+    cc.UserDefault:getInstance():setIntegerForKey("coin", coin + earnCoin)
+    cc.UserDefault:getInstance():setIntegerForKey("exp", exp + self.score)
+	self.view:gameOver(self.score, earnCoin)
+end
+
+function GameModel:getLevelByExp(exp)
+	local expLevel = {}
+	for i = 1, 20 do
+		local expNeed = 2^(i - 1) * 200
+		if expNeed > exp then
+			return i - 1
+		end
+	end
+	return 0
 end

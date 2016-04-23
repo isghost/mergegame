@@ -109,6 +109,7 @@ end
 
 function GameScene:initLogic()
 	self.gameModel = GameModel:create(self)
+	-- 待移动的数字 
 	addTouchListener(self.newNumNode,function()
 		end,function(touch, event)
 			local delta = touch:getDelta()
@@ -130,6 +131,11 @@ function GameScene:initLogic()
 				self.gameModel:setItemProperPosition(pos1, pos2)
 			end
 		end)
+
+	-- 暂停按钮
+	addTouchListenerEnded(self.pauseButton,function()
+		SubPanel.createPausePanel(self,99,888)
+	end)
 end
 
 function GameScene:runMoveAction(actionMove)
@@ -279,6 +285,10 @@ function GameScene:flyNum(pos,value)
 end
 
 function GameScene:runScoreTo(beginValue, endValue)
-	self.curScoreNum:unscheduleUpdate()
+	labelJumpAction(self.curScoreNum,1.0,beginValue,endValue)
+end
+
+function GameScene:gameOver(score, coin)
+	SubPanel.createGameOverPanel(self, score, coin)
 end
 

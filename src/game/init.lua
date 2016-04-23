@@ -8,3 +8,4 @@
  require "game.AboutScene"
  require "game.GameScene"
  require "game.GameModel"
+ require "game.SubPanel"
