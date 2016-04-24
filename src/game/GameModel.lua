@@ -10,6 +10,8 @@ function GameModel:ctor(view)
 	self.nums = {} -- 数字合集
     self.toDoNums = {} -- 待处理数字合集
 	self.score = 0 -- 成绩
+	self.toTrashNeedCoin = 288 -- 使用垃圾箱功能需要的金币
+	self.maxNum = 3 -- 添加随机范围
     self.bestScore = cc.UserDefault:getInstance():getIntegerForKey("bestScore", 0) -- 不合理写法
     self.coin = cc.UserDefault:getInstance():getIntegerForKey("coin", 0) -- 不合理写法
     self.level = self:getLevelByExp(cc.UserDefault:getInstance():getIntegerForKey("exp", 1))
@@ -46,7 +48,7 @@ function GameModel:addGood(pos1,num1,pos2,num2)
 	self.view:runActionQueue(actionQueue)
     if addScore <= 0 then
     	if self:isGameOver() then
-    		self:gameOver()
+    		self:gameOver(true)
     	end
         return 
     end
@@ -90,6 +92,28 @@ function GameModel:checkSynthesis(pos)
 -- 检查合成
 	local value = self.nums[pos]
     if not value then return end
+    -- 如果是M，则消除单位3以内的所有数字 
+    if value == 7 then
+    	local result = {}
+    	local beforeFlag, afterFlag = pos%5 == 1 and 0 or 1, pos%5 == 0 and 0 or 1
+    	
+    	local sum = 0
+    	local forward = {-6 * beforeFlag, -5 , -4 * afterFlag, 
+    					-1 * beforeFlag, 0, 1 * afterFlag, 
+    					4 * beforeFlag, 5, 6 * afterFlag
+    				}
+    	for i = 1, 9 do
+    		local tmpPos = pos + forward[i]
+    		if self.nums[tmpPos] and tmpPos >= 1 and tmpPos <= 25 then
+    			result[#result + 1] = {from = tmpPos,to = pos}
+    			sum = sum + self.nums[tmpPos]
+    			self.nums[tmpPos] = nil
+    		end
+    	end
+    	sum = sum + 50
+    	return sum , {actionType = "merge",result = result, value = sum, pos = pos}
+    end
+    ---------------------------------------
 	local vis = {}
     local queue = {}
     local forward = {-5,1,5,-1}
@@ -130,6 +154,9 @@ function GameModel:checkSynthesis(pos)
     end
 
     self.nums[pos] = value + 1
+    if self.nums[pos] > self.maxNum then
+    	self.maxNum = self.nums[pos]
+    end
 
     return #result * value , {actionType = "merge",result = result, value = value * count, pos = pos}, 
         {actionType = "create",pos = pos,value = value + 1}
@@ -138,14 +165,14 @@ end
 -- 添加待移动的数字
 function GameModel:addToDoItem()
     if self:getCreateItemNum() == 1 then
-        local num = math.random(1,3)
+        local num = self:getRandomNum()
         self.toDoNums = {num}
         self.view:addToDoItem({num})
     else
-        local num1 = math.random(1,3)
+        local num1 = self:getRandomNum()
         local num2 = num1
         while num2 == num1 do
-            num2 = math.random(1,3)
+            num2 = self:getRandomNum()
         end
         self.toDoNums = {num1, num2}
         self.view:addToDoItem({num1, num2})
@@ -229,13 +256,14 @@ function GameModel:isGameOver()
 	return true
 end
 
-function GameModel:gameOver()
+function GameModel:gameOver(isShowPanel)
 	local earnCoin = math.floor(self.score * (self.level * 0.1 + 1))
-	local coin = cc.UserDefault:getInstance():getIntegerForKey("coin", 0) -- 不合理写法
     local exp = cc.UserDefault:getInstance():getIntegerForKey("exp", 1)
-    cc.UserDefault:getInstance():setIntegerForKey("coin", coin + earnCoin)
+    cc.UserDefault:getInstance():setIntegerForKey("coin", self.coin + earnCoin)
     cc.UserDefault:getInstance():setIntegerForKey("exp", exp + self.score)
-	self.view:gameOver(self.score, earnCoin)
+    if isShowPanel then
+		self.view:gameOver(self.score, earnCoin)
+	end
 end
 
 function GameModel:getLevelByExp(exp)
@@ -243,8 +271,40 @@ function GameModel:getLevelByExp(exp)
 	for i = 1, 20 do
 		local expNeed = 2^(i - 1) * 200
 		if expNeed > exp then
-			return i - 1
+			local rate = (exp - expNeed / 2)/(expNeed / 2)
+			return i - 1, math.max(rate, 0)
 		end
 	end
 	return 0
+end
+-- 生新生成待处理数字
+function GameModel:moveToTrash()
+	if self.coin < self.toTrashNeedCoin then
+		-- todo 飘字提醒
+		return 
+	end
+	-- 防修改 ------------------------------------
+	local tmpCoin = self.coin
+	self.coin = {}
+	self.coin = tmpCoin
+	-----------------------------------------------------
+	self.coin = self.coin - self.toTrashNeedCoin
+	self.view:setCoin(self.coin)
+	self.view:resetToDoItem(true)
+    self:addToDoItem()
+end
+
+-- 随机生成数字
+function GameModel:getRandomNum()
+	-- do return math.random(5,6) end
+	local flag = true
+	while flag do
+		flag = false
+		local num = randomByWeight(10,10,10,5,4,2)
+		if num <= self.maxNum then
+			return num
+		else
+			flag = true
+		end
+	end
 end

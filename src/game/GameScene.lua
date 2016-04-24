@@ -85,7 +85,7 @@ function GameScene:initUI()
     	:addTo(self,1,109)
 
     self.coinCostNum = cc.Label:create()
-		:setString("546")
+		:setString("288")
 		:addTo(self,1,110)
 		:setSystemFontSize(35)
 		:setAnchorPoint(0.0,0.5)
@@ -133,9 +133,27 @@ function GameScene:initLogic()
 		end)
 
 	-- 暂停按钮
-	addTouchListenerEnded(self.pauseButton,function()
+	addTouchListenerEnded(self.pauseButton, function()
 		SubPanel.createPausePanel(self,99,888)
 	end)
+
+	-- 垃圾箱
+	addTouchListenerEnded(self.trashButton, function()
+		self.gameModel:moveToTrash()
+	end)
+	local deltaTime = 20.0
+	local tick = 0
+	self.trashButton:scheduleUpdateWithPriorityLua(function(delta)
+		tick = tick + delta
+		if tick < deltaTime then
+			return
+		end
+		tick = 0
+		local posX, posY = self.trashButton:getPosition()
+		getFloatLabel("点击生成新数字")
+			:addTo(self,20000)
+			:setPosition(posX + 100, posY)
+	end,0)
 end
 
 function GameScene:runMoveAction(actionMove)

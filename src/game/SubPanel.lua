@@ -48,10 +48,12 @@ function SubPanel.createPausePanel(parentView)
 	end)
 
 	addTouchListenerEnded(resumeButton,function()
+		parentView.gameModel:gameOver(false)
 		display.runScene(GameScene:create())
 	end)
 
 	addTouchListenerEnded(homeButton,function()
+		parentView.gameModel:gameOver(false)
 		display.runScene(MainScene:create())
 	end)
 end

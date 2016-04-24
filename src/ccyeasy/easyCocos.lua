@@ -89,3 +89,26 @@ function labelJumpAction(label, runTime, beginNum, endNum)
 		end
 	end,0)
 end
+
+--[[--
+ * @description: 飘动数字，需要根据具体项目修改
+ * @param:       string text 显示内容
+ * @return:      nil
+]]
+
+
+function getFloatLabel(text)
+	local label = cc.Label:create()
+		:setPosition(display.center)
+		:setString(text)
+		:setSystemFontSize(30)
+	local moveBy = cc.MoveBy:create(1.0, cc.p(0,100))
+	local fadeTo = cc.FadeTo:create(1.0, 125)
+	local callFunc = cc.CallFunc:create(function()
+		label:removeFromParent()
+	end)
+	local seq = cc.Sequence:create(moveBy, callFunc)
+	label:runAction(seq)
+	label:runAction(fadeTo)
+	return label
+end
