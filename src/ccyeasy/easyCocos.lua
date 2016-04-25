@@ -112,3 +112,22 @@ function getFloatLabel(text)
 	label:runAction(fadeTo)
 	return label
 end
+--
+-- 适配屏幕, 1136x640
+local function adapterScreen()
+	if not display then
+		display = {}
+	end
+	local sizeInPixels = display.sizeInPixels
+	local ratio = sizeInPixels.height / sizeInPixels.width
+	if ratio < 1.5 then
+		display.adapterX, display.adapterY = 0, 0
+	else
+		local realHeight = display.width / sizeInPixels.width * sizeInPixels.height
+		display.adapterY = (display.height - realHeight) / 2 / 5
+		display.adapterX = 0
+	end
+	print(display.adapterX, display.adapterY)
+end
+
+adapterScreen()

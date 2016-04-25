@@ -25,10 +25,10 @@ function GameScene:initUI()
 		:setSystemFontSize(50)
 		:setAnchorPoint(0.5,0.5)
 		:setTextColor(cc.c4b(255,255,255,255))
-		:setPosition(display.center.x, 1100)
+		:setPosition(display.center.x, 1000)
 
 	local bestScore = cc.Sprite:create("best.png")
-	    :setPosition(cc.p(25, 1000))
+	    :setPosition(cc.p(25, 910))
     	:addTo(self,1,102)
 
     self.bestScoreNum = cc.Label:create()
@@ -37,10 +37,10 @@ function GameScene:initUI()
 		:setSystemFontSize(35)
 		:setAnchorPoint(0.0,0.5)
 		:setTextColor(cc.c4b(125,125,125,255))
-		:setPosition(50, 1000)
+		:setPosition(50, 910)
 
 	local coin = cc.Sprite:create("coin.png")
-	    :setPosition(cc.p(25, 960))
+	    :setPosition(cc.p(25, 870))
 	    :setScale(0.7)
     	:addTo(self,1,104)
 
@@ -50,21 +50,21 @@ function GameScene:initUI()
 		:setSystemFontSize(35)
 		:setAnchorPoint(0.0,0.5)
 		:setTextColor(cc.c4b(125,125,125,255))
-		:setPosition(50, 960)
+		:setPosition(50, 870)
 
     self.curScoreNum = cc.Label:create()
 		:setString("546")
 		:addTo(self,1,106)
 		:setSystemFontSize(70)
 		:setAnchorPoint(1.0,0.5)
-		:setPosition(545, 975)
+		:setPosition(540, 890)
 
 	self.pauseButton = ccui.Button:create("pause.png")
 		:addTo(self,1,107)
-		:setPosition(590,975)
+		:setPosition(590,890)
 
 	self.cells = {}
-	local baseX,baseY = 10,200
+	local baseX,baseY = 5, 255
 	for i = 1,5 do
 		for j = 1, 5 do
 			local cell = cc.Sprite:create("num_0.png")
@@ -77,20 +77,20 @@ function GameScene:initUI()
 	self.trashButton = ccui.Button:create("trash.png")
 		:addTo(self,10,108)
 		:setAnchorPoint(0,0.5)
-		:setPosition(0,150)
+		:setPosition(0,200)
 
 	local coinCost = cc.Sprite:create("coin.png")
-	    :setPosition(cc.p(25, 50))
+	    :setPosition(cc.p(25, 113))
 	    :setScale(0.7)
-    	:addTo(self,1,109)
+    	:addTo(self,1,159)
 
     self.coinCostNum = cc.Label:create()
 		:setString("288")
-		:addTo(self,1,110)
+		:addTo(self,1,115)
 		:setSystemFontSize(35)
 		:setAnchorPoint(0.0,0.5)
 		:setTextColor(cc.c4b(125,125,125,255))
-		:setPosition(50, 50)
+		:setPosition(50, 110)
 
 	self.newNumNode = cc.Node:create()
 		:addTo(self, 1000, 111)
@@ -161,12 +161,15 @@ function GameScene:runMoveAction(actionMove)
 	for k,v in pairs(result) do
 		local view = self.views[v.from]
 			:setLocalZOrder(50)
+			:setOpacity(125)
 		self.views[v.from] = nil
 		local moveTo = cc.MoveTo:create(0.5, cc.p(self.cells[v.to]:getPosition()))
+		local scaleTo = cc.ScaleTo:create(0.5, 0.5)
 		local callFunc = cc.CallFunc:create(function()
 			view:removeFromParent()
 		end)
 		view:runAction(cc.Sequence:create(moveTo, callFunc))
+		view:runAction(scaleTo)
 		self:flyNum(actionMove.pos, actionMove.value)
 	end
 end
@@ -223,23 +226,30 @@ end
 
 function GameScene:addToDoItem(nums)
 	self.posIndex = 0
+	local scaleTo = cc.ScaleTo:create(0.13, 1.0)
 	local contentSize = self.newNumNode:getContentSize()
 	if #nums == 1 then
 		local num1View = cc.Sprite:create("num_"..nums[1]..".png")
 			:setAnchorPoint(cc.p(0.5, 0.5))
 			:setPosition(contentSize.width / 2 , contentSize.height / 2)
 			:addTo(self.newNumNode)
+			:setScale(0.3)
+		num1View:runAction(scaleTo:clone())
 		self.toDoItemViews = {num1View}
 		self.rotationBg:setVisible(false)
 	elseif #nums == 2 then
 		local num1View = cc.Sprite:create("num_"..nums[1]..".png")
 			:setAnchorPoint(cc.p(0.5, 0.5))
-			--:setPosition(contentSize.width / 2 , contentSize.height / 2 + 52)
+			:setPosition(contentSize.width / 2 , contentSize.height / 2)
 			:addTo(self.newNumNode)
+			:setScale(0.3)
+		num1View:runAction(scaleTo:clone())
 		local num2View = cc.Sprite:create("num_"..nums[2]..".png")
 			:setAnchorPoint(cc.p(0.5, 0.5))
-			--:setPosition(contentSize.width / 2 , contentSize.height / 2 - 52)
+			:setPosition(contentSize.width / 2 , contentSize.height / 2)
 			:addTo(self.newNumNode)
+			:setScale(0.3)
+		num2View:runAction(scaleTo:clone())
 		self.toDoItemViews = {num1View, num2View}
 		self:tapItems()
 		self.rotationBg:setVisible(true)
@@ -248,7 +258,7 @@ end
 
 -- 恢复到待处理东西的默认位置
 function GameScene:resetToDoItem(clearItem)
-	local itemX, itemY = display.center.x, 125
+	local itemX, itemY = display.center.x, 175 + display.adapterY
 	self.newNumNode:setPosition(itemX, itemY)
 	if clearItem then
 		self.newNumNode:removeAllChildren()
@@ -261,6 +271,7 @@ end
 
 -- 两个以上item时，顺时针切换
 function GameScene:tapItems()
+	self.rotationBg:setVisible(true)
     if #self.toDoItemViews  == 1 then
         return 
     elseif #self.toDoItemViews == 2 then
@@ -270,8 +281,10 @@ function GameScene:tapItems()
     	self.posIndex = self.posIndex%4 + 1
     	local pos1X, pos1Y = centerX + deltaPos[self.posIndex][1], centerY + deltaPos[self.posIndex][2]
     	local pos2X, pos2Y = centerX + deltaPos[(self.posIndex + 1)%4 + 1][1], centerY + deltaPos[(self.posIndex + 1)%4 + 1][2]
-    	self.toDoItemViews[1]:setPosition(pos1X, pos1Y)
-    	self.toDoItemViews[2]:setPosition(pos2X, pos2Y)
+    	local moveTo1 = cc.MoveTo:create(0.1, cc.p(pos1X, pos1Y))
+    	local moveTo2 = cc.MoveTo:create(0.1, cc.p(pos2X, pos2Y))
+    	self.toDoItemViews[1]:runAction(moveTo1)
+    	self.toDoItemViews[2]:runAction(moveTo2)
     end
 end
 

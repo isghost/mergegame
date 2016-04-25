@@ -42,7 +42,7 @@ function SubPanel.createPausePanel(parentView)
 		:addTo(panel, 10)
 		:setPosition(contentSize.width / 4 * 3, 120)
 
-	-- 回调开始
+	-- 回调开始 ------------------------------------------------------------
 	addTouchListenerEnded(closeButton,function()
 		colorLayer:removeFromParent()
 	end)
@@ -55,6 +55,15 @@ function SubPanel.createPausePanel(parentView)
 	addTouchListenerEnded(homeButton,function()
 		parentView.gameModel:gameOver(false)
 		display.runScene(MainScene:create())
+	end)
+
+	addTouchListenerEnded(musicButton,function()
+		local musicSwitch = cc.UserDefault:getInstance():getBoolForKey("music", true)
+		musicSwitch = not musicSwitch
+		cc.UserDefault:getInstance():setBoolForKey("music", musicSwitch)
+		AudioEngine.setEffectsVolume(musicSwitch and 1.0 or 0)
+		local res = musicSwitch and "music.png" or "music_off.png"
+		musicButton:loadTextures(res,"","")
 	end)
 end
 
