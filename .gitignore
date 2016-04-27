@@ -3,3 +3,11 @@
 simulator/win32/res
 simulator/win32/src
 
+# android proj
+frameworks/runtime-src/proj.android/assets/
+frameworks/runtime-src/proj.android/bin/
+frameworks/runtime-src/proj.android/gen/
+frameworks/runtime-src/proj.android/libs/armeabi/
+frameworks/runtime-src/proj.android/local.properties
+frameworks/runtime-src/proj.android/obj/
+simulator/android/
