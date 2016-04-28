@@ -195,7 +195,7 @@ function GameScene:runActionQueue(actionQueue)
 	local curActionIndex = 1
 	local endCallFunc = nil
 	local actionDelay = cc.DelayTime:create(0.3)
-	endCallFunc = cc.CallFunc:create(function()
+	local function endCallFunc()
 		if actionQueue[curActionIndex] then
 			local action = actionQueue[curActionIndex]
 			curActionIndex = curActionIndex + 1
@@ -213,15 +213,13 @@ function GameScene:runActionQueue(actionQueue)
 			-- #12082, 不知道为什么被关闭
 			-- http://stackoverflow.com/questions/28130156/callfunc-doesn-t-get-called-after-delay
 			-- 解决方案：callFunc已经被释放，retain一下
-			self:runAction(cc.Sequence:create(callFunc, cc.DelayTime:create(0.2), endCallFunc:clone()))
+			self:runAction(cc.Sequence:create(callFunc, cc.DelayTime:create(0.2), cc.CallFunc:create(endCallFunc)))
 		else
 			-- warning release
-			endCallFunc:release()
 		end
-	end)
+	end
 	-- warning retain
-	endCallFunc:retain()
-	self:runAction(endCallFunc)
+	endCallFunc()
 end
 
 function GameScene:addToDoItem(nums)
