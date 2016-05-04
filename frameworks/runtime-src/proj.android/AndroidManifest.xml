@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.cocos2dx.code04111"
+      package="merged.ccyblog.www"
       android:versionCode="1"
       android:versionName="1.0"
       android:installLocation="auto">
@@ -25,6 +25,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name="com.qhad.ads.sdk.service.QhAdService"
+         android:enabled="true"
+         android:exported="false">
+        </service>
+        <activity
+         android:name="com.qhad.ads.sdk.adcore.QhAdActivity"
+         android:configChanges="orientation|screenSize|keyboardHidden" >
+        </activity>
     </application>
 
     <supports-screens android:anyDensity="true"
@@ -36,8 +45,12 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>  
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>  
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>  
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>  
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.GET_TASKS"/>  
     
   	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
- 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+ 	  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 </manifest> 

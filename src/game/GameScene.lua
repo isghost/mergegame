@@ -179,6 +179,7 @@ function GameScene:addGood(pos,num)
 		:setPosition(self.cells[pos]:getPosition())
 		:addTo(self,100)
 	self.views[pos] = spriteNum
+	AudioEngine.playEffect("sound/drop.mp3")
 end
 
 function GameScene:runCreateAction(pos,num)
@@ -189,6 +190,8 @@ function GameScene:runCreateAction(pos,num)
 	local scaleTo = cc.ScaleTo:create(0.2, 1.0)
 	spriteNum:runAction(scaleTo)
 	self.views[pos] = spriteNum
+	num = num - 1
+	AudioEngine.playEffect("sound/Eliminate"..num..".mp3")
 end
 
 function GameScene:runActionQueue(actionQueue)

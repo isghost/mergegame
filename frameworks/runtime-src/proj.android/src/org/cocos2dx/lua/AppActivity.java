@@ -26,10 +26,6 @@ THE SOFTWARE.
 ****************************************************************************/
 package org.cocos2dx.lua;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.ArrayList;
 
 import org.cocos2dx.lib.Cocos2dxActivity;
@@ -38,7 +34,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.ActivityInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -46,10 +41,11 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.text.format.Formatter;
-import android.util.Log;
 import android.view.WindowManager;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
+
+import com.qhad.ads.sdk.adcore.Qhad;
+import com.qhad.ads.sdk.interfaces.IQhBannerAd;
 
 
 public class AppActivity extends Cocos2dxActivity{
@@ -64,6 +60,16 @@ public class AppActivity extends Cocos2dxActivity{
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         }
+        RelativeLayout bannerLayout = new RelativeLayout(this);
+        RelativeLayout.LayoutParams parentLayputParams = new RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT);
+        this.addContentView(bannerLayout, parentLayputParams);
+
+        Qhad.setLogSwitch(this, false);//注释此行关闭LOG
+
+        final String adSpaceid = "kakbuA5WEC";
+        IQhBannerAd bannerad = Qhad.showBanner(bannerLayout,AppActivity.this, adSpaceid, false);
         
         //2.Set the format of window
         

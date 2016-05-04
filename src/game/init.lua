@@ -9,3 +9,5 @@
  require "game.GameScene"
  require "game.GameModel"
  require "game.SubPanel"
+
+ AudioEngine.preloadMusic("sound/drop.mp3")

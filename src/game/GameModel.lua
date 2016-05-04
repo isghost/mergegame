@@ -300,7 +300,7 @@ function GameModel:getRandomNum()
 	local flag = true
 	while flag do
 		flag = false
-		local num = randomByWeight(10,10,10,5,4,2)
+		local num = randomByWeight(10,10,10,5,4,1)
 		if num <= self.maxNum then
 			return num
 		else

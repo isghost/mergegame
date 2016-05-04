@@ -38,7 +38,9 @@ function SubPanel.createPausePanel(parentView)
 		:addTo(panel, 10)
 		:setPosition(contentSize.width / 4, 120)
 
-	local musicButton = ccui.Button:create("music.png")
+	local musicSwitch = cc.UserDefault:getInstance():getBoolForKey("music", true)
+	local musicRes = musicSwitch and "music.png" or "music_off.png"
+	local musicButton = ccui.Button:create(musicRes)
 		:addTo(panel, 10)
 		:setPosition(contentSize.width / 4 * 3, 120)
 
@@ -74,6 +76,7 @@ end
 ]]
 
 function SubPanel.createGameOverPanel(parentView, exp, coin)
+	AudioEngine.playEffect("sound/reward.coin.mp3")
 	-- ui
 	local colorLayer = cc.LayerColor:create(cc.c4b(0, 0, 0, 100), display.width, display.height)
 		:addTo(parentView, 10000)
@@ -118,5 +121,40 @@ function SubPanel.createGameOverPanel(parentView, exp, coin)
 	addTouchListenerEnded(okButton,function()
 		display.runScene(GameScene:create())
 	end)
+end
 
+function SubPanel.createSettingPanel(parentView)
+	local colorLayer = cc.LayerColor:create(cc.c4b(0, 0, 0, 100), display.width, display.height)
+		:addTo(parentView, 10000)
+	local panel = cc.Sprite:create("panel.png")
+		:addTo(colorLayer, 10)
+		:setPosition(display.center)
+
+	local contentSize = panel:getContentSize()
+	local labelPause = cc.Label:create()
+		:setString("部分资源来自于网络")
+		:setSystemFontSize(30)
+		:setAnchorPoint(cc.p(0.5,0))
+		:setPosition(contentSize.width / 2, contentSize.height - 150)
+		:addTo(panel, 10)
+	local labelPause = cc.Label:create()
+		:setString("如有侵权，请告知删除!!")
+		:setSystemFontSize(30)
+		:setPosition(contentSize.width / 2, contentSize.height - 200)
+		:setAnchorPoint(cc.p(0.5,0))
+		:addTo(panel, 10)
+	local labelPause = cc.Label:create()
+		:setString("联系方式: 810278677@qq.com")
+		:setSystemFontSize(30)
+		:setAnchorPoint(cc.p(0.5,0))
+		:setPosition(contentSize.width / 2, contentSize.height - 250)
+		:addTo(panel, 10)
+
+	local closeButton = ccui.Button:create("close.png")
+		:addTo(panel, 10)
+		:setPosition(contentSize.width - 50, contentSize.height - 50)
+
+	addTouchListenerEnded(closeButton,function()
+		colorLayer:removeFromParent()
+	end)
 end
