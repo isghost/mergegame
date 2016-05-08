@@ -44,9 +44,6 @@ import android.provider.Settings;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
-import com.qhad.ads.sdk.adcore.Qhad;
-import com.qhad.ads.sdk.interfaces.IQhBannerAd;
-
 
 public class AppActivity extends Cocos2dxActivity{
 
@@ -66,10 +63,10 @@ public class AppActivity extends Cocos2dxActivity{
             RelativeLayout.LayoutParams.WRAP_CONTENT);
         this.addContentView(bannerLayout, parentLayputParams);
 
-        Qhad.setLogSwitch(this, false);//注释此行关闭LOG
+        //Qhad.setLogSwitch(this, false);//注释此行关闭LOG
 
-        final String adSpaceid = "kakbuA5WEC";
-        IQhBannerAd bannerad = Qhad.showBanner(bannerLayout,AppActivity.this, adSpaceid, false);
+        //final String adSpaceid = "kakbuA5WEC";
+        //IQhBannerAd bannerad = Qhad.showBanner(bannerLayout,AppActivity.this, adSpaceid, false);
         
         //2.Set the format of window
         
